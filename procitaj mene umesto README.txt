@@ -13,3 +13,8 @@ u prog ima komentara koji kazu koji odeljak radi sta (mislim da su dovoljno opis
 
 za male promene na rezultatima moze se menjati: PCA_FINAL - linija 92 - izbrisati po koji eig_pairs (menja broj eigen vektora)
 						KNN - linija 81 - broj 10 za koliko hoces komsija i pratiti dalje komentare za sta mora da se menja ako se to promeni
+
+prvo se pokrece PCA_FINAL pa kad zavrsi pokrenuti KNN
+
+NN_FINAL : radice 100000 iteracija za ucenje, na 5000 ce zapisivati tegove, biase i procente
+	   u 3 filea (Hidden_weights, Out_weights, Pct_iter)
