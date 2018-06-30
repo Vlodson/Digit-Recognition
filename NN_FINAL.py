@@ -7,17 +7,33 @@ eig_vec = np.genfromtxt('eig_vec.csv', delimiter = ',')
 
 #-------------
 
-images = mn.train_images()
-images = images.reshape(60000,784)
+images1 = mn.train_images()
+images1 = images1.reshape(60000,784)
+images2 = mn.test_images()
+images2 = images2.reshape(10000,784)
+images = np.vstack((images1, images2))
 images = np.dot(eig_vec.T, images.T)
-images = images[:, :] # menjas 5 na sta hoces, ali moras da promenis i label na isti br
+images = images[:, :60000] # menjas ovo na sta hoces, ali moras da promenis i label na isti br
 #images = images.reshape(5,10)
 images = images.T
+images = images/np.std(images)
+
+for i in range(images.shape[0]):
+    j = 0
+    for j in range(images.shape[1]):
+        if images[i][j] > 0.5:
+            images[i][j] = 1
+        elif images[i][j] >= -0.5 and images[i][j] <= 0.5:
+            images[i][j] = 0
+        elif images[i][j] < -0.5:
+            images[i][j] = -1
+
+# NIJE SPORO 
 
 #-------------
 
 int_labels = mn.train_labels()
-int_labels = int_labels[:] # promeniti br na isti broj koji pise i kod images
+int_labels = int_labels[:15] # promeniti br na isti broj koji pise i kod images
 temp = [0,0,0,0,0,0,0,0,0]
 labels = []
 
@@ -37,13 +53,13 @@ in_neurons = images.shape[1] # ovo ce se menjati kako menjam kolicinu eig_vec
 
 out_neurons = 10
 
-hidden_neurons = 10 # probati razlicite kolicine
+hidden_neurons = 10 # probati razlicite kolicine (in + out neurons / 2)
 
-learn_rate = 0.1 # poigravaj se sa ovime
+learn_rate = 0.01 # poigravaj se sa ovime (ovo je na loss funkciji za koliko ces da se spustis kada radis slope)
 
 #learn_iter_iter = 5
 
-learn_iter = 100000 # PROMENI ME NA VELIKI BROJ
+learn_iter = 5000 # PROMENI ME NA VELIKI BROJ
 
 #============================
 
@@ -93,7 +109,7 @@ while i < learn_iter:
     
     hidden_input = np.dot(images, w_h) + b_h
     
-    hidden_input = hidden_input/np.std(hidden_input) # normalizacija podataka br/sr.vr
+    #hidden_input = hidden_input/1000 # normalizacija podataka br/sr.vr (np.std(hidden_input))
 
     hidden_activation = tanhf(hidden_input)
 
@@ -143,16 +159,23 @@ while i < learn_iter:
         
     #GUESS (za vezbanje)
     
-    if ((i/5000).is_integer() == True) and (i/5000 != 0.0):
+    if ((i/500).is_integer() == True) and (i/500 != 0.0): # promeniti oba broja na learn_iter/10
 
         temp = [np.argmax(output[j]) == np.argmax(labels[j]) for j in range(len(images))]
         # da li je one line for loop brzi od viselinijskog?
     
         rez.append((np.count_nonzero(np.array(temp) == True) / len(images) * 100, i))
         
+        
         write_data('Out_weights.csv', w_o)
         write_data('Hidden_weights.csv', w_h)
         write_data('Pcnt_iter.csv', np.array(rez))
+        rez = []
+        write_data('Out_bias.csv', b_o)
+        write_data('Hidden_bias.csv', b_h)
+
+
+        print(i)
 #===================================
 
 
